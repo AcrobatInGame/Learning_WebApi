@@ -1,11 +1,9 @@
-using System.Text.Json.Serialization;
-namespace Learning_WebApi.Model;
+namespace Learning_WebApi.Data.Entity;
+
 public class Operation
 {
-    [JsonIgnore]
     public int Id { get; set; }
-
     public string Name { get; set; }
-    public double Sum { get; set; }
+    public int Sum { get; set; }
     public string Category { get; set; }
 }

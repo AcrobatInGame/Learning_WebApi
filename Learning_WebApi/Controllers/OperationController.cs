@@ -3,10 +3,6 @@ using Learning_WebApi.Data.Entity;
 using Learning_WebApi.Model;
 using Microsoft.AspNetCore.Mvc;
 // ReSharper disable All
-
-namespace Learning_WebApi.Controllers;
-
-[Route("api/[controller]")]
 [ApiController]
 public class OperationController: ControllerBase
 {
@@ -51,6 +47,7 @@ public class OperationController: ControllerBase
         
         return Ok("Operation was successfully deleted");
     }
+
     
     [HttpGet]
     public ActionResult ShowOperations() //начинается с последних операций
@@ -59,7 +56,6 @@ public class OperationController: ControllerBase
         {
             return NotFound("There is no operations in your account history");
         }
-        
         var answers = new List<string>();
         foreach(var op in  _context.Operations.ToArray().Reverse())
         {
@@ -68,7 +64,7 @@ public class OperationController: ControllerBase
         
         return Ok(answers);
     }
-    
+
     [HttpPut]
     public ActionResult ModerateOperation(int id, [FromBody] OperationDto operationDto)
     {

@@ -1,6 +1,6 @@
 namespace Learning_WebApi.Model;
 
-public class OperationExamination
+public class OperationValidator
 {
     public static IEnumerable<string> ValidateOperation(OperationDto operationDto)
     {
@@ -17,5 +17,6 @@ public class OperationExamination
         {
             yield return ("Operation sum can't be negative");
         }
+        //if()
     }
 }

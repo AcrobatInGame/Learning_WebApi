@@ -6,4 +6,6 @@ public class Operation
     public string Name { get; set; }
     public int Sum { get; set; }
     public string Category { get; set; }
+    public int UserId { get; set; }
+    public int DisplayId { get; set; }
 }

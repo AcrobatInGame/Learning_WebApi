@@ -18,6 +18,12 @@ public class OperationController: ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateOperation([FromBody] OperationDto operationDto)
     {
+        int userId = CheckLogin();
+        if (userId == 0)
+        {
+            return Unauthorized("You are not logged in");
+        }
+        
         List<string> operationErrors = OperationValidator.ValidateOperation(operationDto).ToList();
         if (operationErrors.Any())
         {
@@ -26,7 +32,7 @@ public class OperationController: ControllerBase
 
         int displayId;
         int maxDisplayId = await _context.Operations
-            .Where(o => o.UserId == operationDto.UserId) //помощь джемини, надо доразобрать SQL
+            .Where(o => o.UserId == userId) //помощь джемини, надо доразобрать SQL
             .MaxAsync(o => (int?)o.DisplayId) ?? 0;
         displayId = maxDisplayId + 1;
         
@@ -34,7 +40,7 @@ public class OperationController: ControllerBase
             Name = operationDto.Name,
             Sum = operationDto.Sum,
             Category = operationDto.Category,
-            UserId = operationDto.UserId,
+            UserId = userId,
             DisplayId = displayId};
         
         _context.Operations.Add(operationEntity);
@@ -44,8 +50,13 @@ public class OperationController: ControllerBase
     }
 
     [HttpDelete]
-    public ActionResult DeleteOperation(int id, int userId)
+    public ActionResult DeleteOperation(int id)
     {
+        int userId =  CheckLogin();
+        if (userId == 0)
+        {
+            return Unauthorized("You are not logged in");
+        }
         var deleteOperation = _context.Operations.FirstOrDefault(op => op.DisplayId == id && op.UserId == userId);
         if (deleteOperation == null)
         {
@@ -60,8 +71,13 @@ public class OperationController: ControllerBase
 
     
     [HttpGet]
-    public ActionResult ShowOperations(int userId) //начинается с последних операций
+    public ActionResult ShowOperations() //начинается с последних операций
     {
+        int userId =  CheckLogin();
+        if (userId == 0)
+        {
+            return Unauthorized("You are not logged in");
+        }
         if (!_context.Operations.Any(u => u.UserId == userId))
         {
             return NotFound("There is no operations in your account history");
@@ -78,7 +94,12 @@ public class OperationController: ControllerBase
     [HttpPut]
     public ActionResult ModerateOperation(int id, [FromBody] OperationDto operationDto)
     {
-        var operation = _context.Operations.FirstOrDefault(op => op.DisplayId == id);
+        int userId =  CheckLogin();
+        if (userId == 0)
+        {
+            return Unauthorized("You are not logged in");
+        }
+        var operation = _context.Operations.FirstOrDefault(op => op.DisplayId == id && op.UserId == userId);
         if (operation == null)
         {
             return NotFound("There is no operation with this id");
@@ -91,5 +112,15 @@ public class OperationController: ControllerBase
         _context.SaveChanges();
         
         return Ok("Operation was successfully modified");
+    }
+
+    int CheckLogin()
+    {
+        string? UserIdCookie = Request.Cookies["UserId"];
+        if (!int.TryParse(UserIdCookie, out int UserId))
+        {
+            return 0;
+        }
+        return UserId;
     }
 }

@@ -61,6 +61,15 @@ public class UserController : ControllerBase
         {
             return Unauthorized("Invalid email or password.");
         }
+
+        Response.Cookies.Append("UserId", user.UserId.ToString(), new CookieOptions()
+        {
+            Expires = DateTime.Now.AddMinutes(30),
+            HttpOnly = true,
+            Secure = true,
+            SameSite = SameSiteMode.Strict,
+            Path = "/"
+        });
         return Ok($"You were successfully logged in, your id:{user.UserId}");
     }
 }
